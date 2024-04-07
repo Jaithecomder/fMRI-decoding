@@ -1,0 +1,4 @@
+loguru==0.5.3
+nilearn==0.7.0
+pandas==1.1.5
+torch==1.0.0
