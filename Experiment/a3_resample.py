@@ -16,7 +16,7 @@ from joblib import Parallel, delayed
 import pandas as pd
 import numpy as np
 import nibabel as nib
-from nilearn.image import resample_to_img
+from nilearn.image import resample_to_img, resample_img
 
 
 # ============================
@@ -67,7 +67,6 @@ def resample_mini_batch(fmris, ref_map, cache_folder,
     if resamp_field not in fmris_resamp.columns:
         fmris_resamp[resamp_field] = ""
 
-    print("Resampling", len(fmris), "fMRIs")
     for idx, row in fmris.iterrows():
         file = row[file_field]
         if overwrite or not os.path.isfile(row[resamp_field]):
@@ -79,9 +78,14 @@ def resample_mini_batch(fmris, ref_map, cache_folder,
                             + suffix
                             + ".nii.gz")
                 map_orig = nib.load(file)
+                map_orig_data = map_orig.get_fdata()
+                map_orig_data[np.isnan(map_orig_data)] = 0
+                map_orig_data[np.isinf(map_orig_data)] = 0
+                map_orig = nib.Nifti1Image(map_orig_data, map_orig.affine)
                 map_resampled = resample_to_img(map_orig,
                                                 ref_map,
-                                                interpolation=interpolation)
+                                                interpolation=interpolation,
+                                                fill_value=0)
                 map_resampled.to_filename(new_file)
                 fmris_resamp.at[idx, resamp_field] = new_file
                 if verbose:
@@ -117,8 +121,8 @@ def resample_batch(fmris_file,
 
     ref_map = nib.load(ref_file)
 
-    fmris_split = np.array_split(fmris[fmris["kept"]], 20)
-    # fmris_split = fmris[fmris["kept"]]
+    fmris_split_idx = np.array_split(fmris[fmris["kept"]].index, n_jobs)
+    fmris_split = [fmris.loc[idx] for idx in fmris_split_idx]
 
     resamp = lambda x: resample_mini_batch(x, ref_map, cache_folder, overwrite,
                                            file_field=file_field,
@@ -127,7 +131,6 @@ def resample_batch(fmris_file,
                                            verbose=verbose)
     results = (Parallel(n_jobs=n_jobs, verbose=1, backend="threading")
                (delayed(resamp)(x) for x in fmris_split))
-    # results = [resamp(x) for x in fmris_split]
 
     fmris_resamp = pd.DataFrame()
     errors = 0

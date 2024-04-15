@@ -82,8 +82,9 @@ def remove_duplicate_labels(fmris, vocab, n_jobs):
             labels_no_task=lambda df: df.labels_no_task.astype(str).apply(verif_labels_for_vocab),
             labels_all=lambda df: df.labels_all.astype(str).apply(verif_labels_for_vocab),
         )
-
-    df_splits = np.array_split(fmris, n_jobs * 3)
+    
+    df_splits_idx = np.array_split(fmris.index, n_jobs * 3)
+    df_splits = [fmris.loc[idx] for idx in df_splits_idx]
 
     df_splits_processed = Parallel(n_jobs)(
         delayed(partial(_remove_duplicates, vocab=vocab))(fmris=df) for df in df_splits
@@ -127,7 +128,8 @@ def encompass_labels_from_manual_hierarchy(fmris, config, n_jobs):
 
         return fmris
 
-    df_splits = np.array_split(fmris, n_jobs * 3)
+    df_splits_idx = np.array_split(fmris.index, n_jobs * 3)
+    df_splits = [fmris.loc[idx] for idx in df_splits_idx]
 
     df_splits_processed = Parallel(n_jobs)(
         delayed(partial(_encompass_labels, config=config))(fmris=df) for df in df_splits
@@ -176,7 +178,7 @@ def prepare_label(global_config=None, n_jobs=1, verbose=False):
     fmris_test = (
         fmris_kept.loc[fmris_kept["collection_id"].isin(config["id_test"])]
         .copy()
-        .assign(tags=lambda df: df.tags.str.replace("_", " "))
+        .assign(tags=lambda df: df.tags_hcp.astype(str).str.replace("_", " "))
     )
 
     # -------------------------------
@@ -216,10 +218,10 @@ def prepare_label(global_config=None, n_jobs=1, verbose=False):
 
     fmris_train = parallel_vocab_tagger(n_jobs, vocab, fmris_train,
                                label_col="labels_from_tags",
-                               col_white_list=["tags", ])
+                               col_white_list=["tags_hcp", ])
     fmris_test = parallel_vocab_tagger(n_jobs, vocab, fmris_test,
                               label_col="labels_from_tags",
-                              col_white_list=["tags", ])
+                              col_white_list=["tags_hcp", ])
 
     # Get labels from contrasts
     if verbose:
@@ -245,7 +247,7 @@ def prepare_label(global_config=None, n_jobs=1, verbose=False):
         vocab,
         fmris_train,
         label_col="labels_from_all",
-        col_black_list=["contrast_definition", "tags"]
+        col_black_list=["contrast_definition", "tags_hcp"]
     )
 
     # -------------------

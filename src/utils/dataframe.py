@@ -55,11 +55,12 @@ def lookup(pattern, df,
               df_explored.columns)
 
     # does the lookup
-    mask = np.column_stack([df_explored[col].astype(str).str.contains(pattern,
+    lookupArr = [df_explored[col].astype(str).str.contains(pattern,
                                                           case=case,
                                                           regex=regex,
                                                           na=False)
-                            for col in df_explored])
+                            for col in df_explored]
+    mask = np.column_stack(lookupArr)
     if verbose:
         print("> Found values:",
               mask.sum())
@@ -292,7 +293,7 @@ def dumb_tagger(df,
     else:
         labels_dummies = pd.get_dummies(
             tags.apply(pd.Series).stack()
-        ).sum(level=0)
+        ).groupby(level=0).sum()
         df_res = labels_dummies
 
     return df_res

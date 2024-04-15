@@ -18,8 +18,10 @@ import pandas as pd
 import numpy as np
 import nibabel as nib
 from joblib import Parallel, delayed
-from nilearn.maskers import NiftiMasker, MultiNiftiMasker
+from nilearn.maskers import NiftiMasker
+from nilearn.image import resample_img
 from sklearn import preprocessing
+from alive_progress import alive_bar
 
 # =========================
 # === MASKING FUNCTIONS ===
@@ -29,9 +31,10 @@ def mask_mini_batch(fmris, masker, verbose=False):
         print("  > masking started (one mini-batch, {} fMRIS)"
               .format(len(fmris)))
 
-    X = np.zeros((len(fmris), masker.mask_img.get_data().sum()))
+    X = np.zeros((len(fmris), int(masker.mask_img.get_fdata().sum())))
     i = 0
-    for idx, fmri in fmris.iteritems():
+
+    for idx, fmri in fmris.iterrows():
         X[i] = masker.transform(fmri)
         i += 1
 
@@ -43,12 +46,18 @@ def mask_mini_batch(fmris, masker, verbose=False):
 
 def mask_batch(fmris_file, masker, n_jobs=1, verbose=False):
     fmris = pd.read_csv(fmris_file, index_col=0, header=0,
-                        low_memory=False, squeeze=True)
+                        low_memory=False)
 
     if verbose:
         print("> File read, {} fMRIs will be  masked".format(len(fmris)))
 
-    fmri_split = np.array_split(fmris, n_jobs)
+    fmri_split_idx = np.array_split(fmris.index, n_jobs)
+    fmri_split = [fmris.loc[idx] for idx in fmri_split_idx]
+    # results = []
+    # with alive_bar(len(fmri_split)) as bar:
+    #     for fmri in fmri_split:
+    #         results.append(mask_mini_batch(fmri, masker, verbose=verbose))
+    #         bar()
     ma = lambda x: mask_mini_batch(x, masker, verbose=verbose)
     results = (Parallel(n_jobs=n_jobs, verbose=1, backend="threading")
                (delayed(ma)(x) for x in fmri_split))
@@ -171,7 +180,7 @@ def prepare_embed(fmris_masked, global_config=None, verbose=False):
     mask = nib.load(global_config["mask_file"])
     atlas = nib.load(global_config["dict_file"])
 
-    masker = MultiNiftiMasker(mask_img=mask).fit()
+    masker = NiftiMasker(mask_img=mask).fit()
     print(atlas.shape)
     atlas_masked = masker.transform(atlas)
 

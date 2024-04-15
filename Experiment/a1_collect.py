@@ -119,7 +119,7 @@ def add_hcp_tags(fmris, hcp_file):
     hcp_meta = (
         pd.read_csv(hcp_file, sep='\t')
         .replace(1.0, True)
-        .fillna(value=False)
+        .infer_objects(copy=False)
     )
 
     # Get the tags string for each fMRI
@@ -128,6 +128,7 @@ def add_hcp_tags(fmris, hcp_file):
         hcp_meta.at[idx, "tags"] = tags
 
     fmris = fmris.assign(tags_hcp="")
+    fmris = fmris.assign(task="")
     for idx, row in fmris[fmris["collection_id"] == 4337].iterrows():
         for idx_hcp, row_hcp in hcp_meta.iterrows():
             if (
@@ -136,6 +137,7 @@ def add_hcp_tags(fmris, hcp_file):
                 (row["contrast_definition"] == row_hcp["Condition"])
             ):
                 fmris.at[idx, "tags_hcp"] = row_hcp["tags"]
+                fmris.at[idx, "task"] = row_hcp["Task"]
 
     return fmris
 
@@ -166,7 +168,7 @@ def prepare_collect(global_config=None, verbose=False):
         print(f" > Fetch fMRIs from {source}")
 
     neurovault = fetch_neurovault(
-        max_images=1000,
+        max_images=5000,
         collection_terms={},
         image_terms={},
         data_dir=str(nv_path),

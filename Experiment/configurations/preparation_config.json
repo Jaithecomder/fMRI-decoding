@@ -2,12 +2,12 @@
   "nv_path":       "../Data/neurovault/",
   "cache_path":    "../output/",
   "mask_file":     "../Data/masks/task_mask.nii.gz",
-  "dict_file":     "../Data/atlases/components_1024_task.nii.gz",
+  "dict_file":     "../Data/atlases/256/3mm/maps.nii.gz",
   "meta_path":     "../Data/meta/",
   "meta_file":     "fmris_meta.csv",
 
   "collect": {
-    "download_mode": "offline",
+    "download_mode": "download_new",
     "hcp_tags": "../Data/labels/hcp_tags.csv"
   },
 

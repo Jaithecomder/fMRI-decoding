@@ -143,4 +143,6 @@ cython_debug/
 # Data folders
 Data/
 output/
-Experiment/fmris_masked.p
+*.p
+*.csv
+*.pt

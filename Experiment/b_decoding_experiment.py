@@ -178,11 +178,18 @@ def decoding_experiment(configuration="spec_template.json",
     # Samples' labels loading
     labels = pd.read_csv(config["data"]["labels_file"], low_memory=False, index_col=0)
 
+    mask_labels_in_fmris = labels.index.isin(meta.index)
+    labels = labels[mask_labels_in_fmris]
+
+    mask_meta_in_labels = meta.index.isin(labels.index)
+    meta = meta[mask_meta_in_labels]
+    X = X[mask_meta_in_labels]
+
     logger.info("Data loaded")
     logger.info(f"Number of kept fMRIs in dataset {len(meta)}")
 
     # Only keep samples (fMRIs metadata and their embeddings) with labels
-    mask_labelled = ~labels.iloc[:, 0].isna()
+    mask_labelled = ~labels.iloc[:, 0].isna().values
     meta, X, labels = mask_rows(mask_labelled, meta, X, labels)
 
     # Target as a one-hot encoding of labels
@@ -249,7 +256,10 @@ def decoding_experiment(configuration="spec_template.json",
     # Update of data and testset mask after highly correlated labels removal
     mask_has_low_corr_lab = (np.sum(Y, axis=1) != 0)
     meta, X, Y = mask_rows(mask_has_low_corr_lab, meta, X, Y)
-    mask_test = meta["collection_id"].isin(config["evaluation"]["test_IDs"])
+    # mask_test = meta["collection_id"].isin(config["evaluation"]["test_IDs"])
+    mask_test = np.array([False] * len(meta))
+    inds = np.random.choice(len(meta), int(len(meta) * 0.2), replace=False)
+    mask_test[inds] = True
     
     # save original version of labels to predict before labels inference
     Y_orig = Y.copy()
@@ -347,7 +357,7 @@ def decoding_experiment(configuration="spec_template.json",
     pd.DataFrame(vocab_current).to_csv(f"{path}vocab.csv")
 
     logger.info("Preprocessed data saved")
-    return
+
     # ---------------------------
     # --- MODEL INSTANCIATION ---
     # ---------------------------

@@ -363,24 +363,20 @@ class PytorchEstimator(BaseEstimator):
                             sampler=sampler,
                             shuffle=sampler is None,
                             num_workers=0,
-                            # pin_memory=not self.sample_gpu,
-                            timeout=120)
+                            # pin_memory=not self.sample_gpu
+                            )
         val_loader = DataLoader(
             val_dataset,
             batch_size=batch_size,
             sampler=sampler,
             shuffle=sampler is None,
             num_workers=0,
-            # pin_memory=not self.sample_gpu,
-            timeout=120,
+            # pin_memory=not self.sample_gpu
         )
 
         for index, epoch in enumerate(iterator):
             # reset total loss for this epoch
             current_loss = 0
-
-            # step for learning rate decrease
-            exp_lrs.step()
 
             # run mini-batch
             for X_tensor, y_tensor in loader:
@@ -412,6 +408,9 @@ class PytorchEstimator(BaseEstimator):
                 optimizer.zero_grad()
                 loss_train.backward()
                 optimizer.step()
+            
+            # step for learning rate decrease
+            exp_lrs.step()
 
             current_val_loss = 0
             for X_tensor, y_tensor in val_loader:

@@ -59,7 +59,7 @@ def extract_meta(fmris_meta, config):
         fmris_meta.at[idx, "dim_z"] = dim_z
 
         try:
-            mat = fmri.get_data().astype(float)
+            mat = fmri.get_fdata().astype(float)
         except BaseException:
             print("Error with", row["absolute_path"])
             raise RuntimeError("Error unzipping a file")
@@ -92,7 +92,7 @@ def extract_meta(fmris_meta, config):
             fmris_meta.at[idx, "first_quantile"] = 0
             fmris_meta.at[idx, "last_quantile"] = 0
 
-        fmris_meta.at[idx, "hash"] = hash(mat[~np.isnan(mat)].tostring())
+        fmris_meta.at[idx, "hash"] = hash(mat[~np.isnan(mat)].tobytes())
         fmri.uncache()
 
     return fmris_meta
@@ -139,7 +139,8 @@ def filter_data(colls_file,
     if verbose:
         print("... extraction from Nifty files ...")
 
-    fmris_meta_split = np.array_split(fmris, n_jobs * 3)
+    fmris_meta_split_idx = np.array_split(fmris.index, n_jobs * 3)
+    fmris_meta_split = [fmris.loc[idx] for idx in fmris_meta_split_idx]
 
     results = (
         Parallel(n_jobs=n_jobs, verbose=1, backend="threading")
