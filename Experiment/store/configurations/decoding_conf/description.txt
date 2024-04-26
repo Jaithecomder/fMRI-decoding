@@ -1,0 +1,24 @@
+Experiment: .\configurations\decoding_conf
+  Trained on: 2024-04-26 13:29:55.711423
+  Scaling: samples
+  Positive values only: True
+  Group reweighting power: 1.0
+  Concept similarity transformation: none
+  Model: ModelLogReg1NonLin(
+  (input_dropout): Dropout(p=0.0, inplace=False)
+  (hidden_dropout): Dropout(p=0.3, inplace=False)
+  (relu): ReLU()
+  (linear1): Linear(in_features=256, out_features=300, bias=True)
+  (linear2): Linear(in_features=300, out_features=81, bias=True)
+)
+  Parameters: {'lr': [0.003], 'l1_reg': [0.001], 'l2_reg': [0.001], 'latent_dim': [300], 'hidden_dropout': [0.3]}
+  
+    PERFORMANCES:
+        DUMB BASELINE:
+            Recall@10 TRAIN: 0.5354504013551019
+            Recall@10 TEST: 0.5135012682048764
+        MODEL:
+            Recall@10 TRAIN: 0.9358145315727415
+            Recall@10 TEST: 0.8209361192930781
+            Mean ROC AUC TEST: 0.9048015610253225
+    

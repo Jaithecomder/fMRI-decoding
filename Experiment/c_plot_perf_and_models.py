@@ -21,7 +21,7 @@ import pandas as pd
 import seaborn as sns
 import torch
 from nilearn.plotting import plot_stat_map, plot_glass_brain
-from nilearn.input_data import NiftiMasker
+from nilearn.maskers import NiftiMasker
 
 from b_decoding_experiment import PytorchEstimator
 
@@ -98,24 +98,24 @@ def main():
                         default="../Data/results/perf.PNG",
                         help="Path to the file where results are saved")
     parser.add_argument("-f", "--features",
-                        default="../Data/X.p",
+                        default="./store/configurations/decoding_conf/X_test.p",
                         help="Path of the pickle file "
                              "containing the matrix of fMRI stat maps")
     parser.add_argument("-m", "--mask",
-                        default="../Data/masks/mask.nii.gz",
+                        default="../Data/masks/task_mask_new.nii.gz",
                         help="Path of the Nifti file containing the mask used "
                              "for full voxel maps")
     parser.add_argument("-a", "--atlas",
-                        default="../Data/models/components_1024_task.nii.gz",
+                        default="../Data/atlases/256/3mm/maps.nii.gz",
                         help="Path of the Nifti file containing the brain atlas"
                              " (dictionary) used to embed the features used "
                              "for both encoding and decoding")
     parser.add_argument("-l", "--labels",
-                        default="../Data/Y.p",
+                        default="./store/configurations/decoding_conf/Y_test.p",
                         help="Path of the pickle file "
                              "containing the matrix of map labels")
     parser.add_argument("-d", "--decoding_model",
-                        default="../Data/models/clf.pt",
+                        default="./store/configurations/decoding_conf/clf.pt",
                         help="Path of the pytorch dump of a decoding model "
                              "trained provided on the maps and labels")
     # parser.add_argument("-e", "--encodings",
@@ -123,7 +123,7 @@ def main():
     #                     help="Path of the pickle dump of the dictionary "
     #                          "of encoding maps")
     parser.add_argument("-c", "--concepts",
-                        default="../Data/concepts.csv",
+                        default="../Data/labels/cogatlas_concepts.txt",
                         help="Path of the CSV file of comma separated concepts"
                              ", ordered as the columns of the labels file")
     parser.add_argument("-r2", "--results_file",
@@ -279,7 +279,8 @@ def main():
     # --------------------
     # --- DATA LOADING ---
     # --------------------
-    vocab = list(pd.read_csv(args.concepts, index_col=0).values.flat)
+    # vocab = list(pd.read_csv(args.concepts, index_col=0).values.flat)
+    vocab = ylabels
 
     mask = nib.load(args.mask)
     masker = NiftiMasker(mask_img=mask).fit()
