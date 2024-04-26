@@ -1,7 +1,7 @@
 {
   "nv_path":       "../Data/neurovault/",
   "cache_path":    "../output/",
-  "mask_file":     "../Data/masks/task_mask.nii.gz",
+  "mask_file":     "../Data/masks/task_mask_new.nii.gz",
   "dict_file":     "../Data/atlases/256/3mm/maps.nii.gz",
   "meta_path":     "../Data/meta/",
   "meta_file":     "fmris_meta.csv",

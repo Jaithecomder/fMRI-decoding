@@ -1,5 +1,5 @@
 Experiment: decoding_conf
-  Trained on: 2024-04-15 13:24:54.984950
+  Trained on: 2024-04-26 00:59:35.217247
   Scaling: samples
   Positive values only: True
   Group reweighting power: 1.0
@@ -9,16 +9,16 @@ Experiment: decoding_conf
   (hidden_dropout): Dropout(p=0.3, inplace=False)
   (relu): ReLU()
   (linear1): Linear(in_features=256, out_features=300, bias=True)
-  (linear2): Linear(in_features=300, out_features=56, bias=True)
+  (linear2): Linear(in_features=300, out_features=83, bias=True)
 )
   Parameters: {'lr': [0.003], 'l1_reg': [0.001], 'l2_reg': [0.001], 'latent_dim': [300], 'hidden_dropout': [0.3]}
   
     PERFORMANCES:
         DUMB BASELINE:
-            Recall@10 TRAIN: 0.5395001402516433
-            Recall@10 TEST: 0.5177099334357399
+            Recall@10 TRAIN: 0.5498710743331185
+            Recall@10 TEST: 0.5349478638055193
         MODEL:
-            Recall@10 TRAIN: 0.9367733302102039
-            Recall@10 TEST: 0.7397465437788019
-            Mean ROC AUC TEST: 0.8500576068132547
+            Recall@10 TRAIN: 0.9337952684560575
+            Recall@10 TEST: 0.8328940032588358
+            Mean ROC AUC TEST: 0.920558385688583
     

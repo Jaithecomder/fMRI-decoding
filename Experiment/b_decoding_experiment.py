@@ -578,7 +578,8 @@ def decoding_experiment(configuration="spec_template.json",
 
     if os.path.isfile(results_file):
         previous_results = pd.read_csv(results_file, index_col=0)
-        full_results = previous_results.append(results_df)
+        # full_results = previous_results.append(results_df)
+        full_results = pd.concat([previous_results, results_df], axis=0)
         full_results.index = list(range(len(full_results)))
         full_results.to_csv(results_file, header=True)
     else:

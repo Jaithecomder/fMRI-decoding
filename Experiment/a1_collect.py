@@ -168,7 +168,7 @@ def prepare_collect(global_config=None, verbose=False):
         print(f" > Fetch fMRIs from {source}")
 
     neurovault = fetch_neurovault(
-        max_images=5000,
+        max_images=10000,
         collection_terms={},
         image_terms={},
         data_dir=str(nv_path),
