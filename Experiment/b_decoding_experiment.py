@@ -99,7 +99,7 @@ def decoding_experiment(configuration="spec_template.json",
         config = json.load(f)
 
     # Path where to save transformed data, model and results
-    path = folder + ID + "/"
+    path = folder + ID + "\\"
     per_label_results_file = path + "per_label_results.csv"
 
     # Control whether the experiment was already run
@@ -116,7 +116,7 @@ def decoding_experiment(configuration="spec_template.json",
             return 0
 
     # Copy original configuration to backup folder
-    shutil.copy(configuration, path + configuration.split("/")[-1])
+    shutil.copy(configuration, path + configuration.split("\\")[-1])
 
     # If GPU is used, limit CUDA visibility to this device
     if used_gpu >= 0:
@@ -456,7 +456,7 @@ def decoding_experiment(configuration="spec_template.json",
     else:
         with open(path + "clf.p", 'wb') as f:
             pickle.dump(clf, f)
-        torch.save(clf.model, path + "clf.pt")
+        torch.save(clf.model, path + "clf_ae.pt")
 
     # ------------------
     # --- EVALUATION ---

@@ -1,5 +1,5 @@
 Experiment: .\configurations\decoding_conf
-  Trained on: 2024-04-26 13:29:55.711423
+  Trained on: 2024-05-05 23:40:03.330207
   Scaling: samples
   Positive values only: True
   Group reweighting power: 1.0

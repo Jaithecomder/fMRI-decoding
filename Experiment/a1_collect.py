@@ -15,6 +15,7 @@ from pathlib import Path
 import argparse
 import json
 import pandas as pd
+import numpy as np
 from nilearn.datasets import fetch_neurovault
 
 
@@ -120,6 +121,7 @@ def add_hcp_tags(fmris, hcp_file):
         pd.read_csv(hcp_file, sep='\t')
         .replace(1.0, True)
         .infer_objects(copy=False)
+        .fillna(False)
     )
 
     # Get the tags string for each fMRI
@@ -136,7 +138,7 @@ def add_hcp_tags(fmris, hcp_file):
                 and
                 (row["contrast_definition"] == row_hcp["Condition"])
             ):
-                fmris.at[idx, "tags_hcp"] = row_hcp["tags"]
+                # fmris.at[idx, "tags_hcp"] = row_hcp["tags"]
                 fmris.at[idx, "task"] = row_hcp["Task"]
 
     return fmris
